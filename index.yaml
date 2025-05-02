@@ -3,23 +3,23 @@ entries:
   nodepulse:
     - apiVersion: v2
       appVersion: "1.0.0"
-      created: "2024-05-02T00:00:00.000000000Z"
-      description: NodePulse is a plug-and-play observability stack for Kubernetes, combining Prometheus, Grafana, Loki, Trivy, OpenTelemetry, and more to deliver unified metrics, logs, traces, and security insights.
-      digest: ""
+      created: "2024-03-21T12:00:00Z"
+      description: A plug-and-play observability stack for Kubernetes
+      digest: sha256:975de7777aff0454f5c992f58070da02cde606edb718df01c08a2ce5c78810c7
       home: https://github.com/DARK-art108/nodepulse
       icon: https://raw.githubusercontent.com/DARK-art108/nodepulse/main/logo.png
       keywords:
         - monitoring
+        - observability
+        - kubernetes
         - prometheus
         - grafana
         - loki
-        - metrics
-        - security
-        - tracing
-        - kubernetes
+        - trivy
+        - opentelemetry
       maintainers:
-        - name: Ritesh Yadav
-          email: ritesh.yadav@example.com
+        - name: DARK-art108
+          email: your-email@example.com
       name: nodepulse
       sources:
         - https://github.com/DARK-art108/nodepulse
@@ -29,47 +29,46 @@ entries:
       version: 0.1.0
       annotations:
         artifacthub.io/changes: |
-          - Initial release
+          - Initial release of NodePulse monitoring stack
         artifacthub.io/images: |
           - name: prometheus
             image: prom/prometheus:v2.45.0
           - name: grafana
-            image: grafana/grafana:9.5.3
+            image: grafana/grafana:10.0.0
           - name: loki
-            image: grafana/loki:2.8.2
-          - name: metrics-server
-            image: k8s.gcr.io/metrics-server/metrics-server:v0.6.3
+            image: grafana/loki:2.8.0
           - name: trivy-operator
-            image: aquasec/trivy-operator:0.12.0
+            image: aquasec/trivy-operator:0.18.0
           - name: opentelemetry-collector
-            image: otel/opentelemetry-collector:0.50.0
+            image: otel/opentelemetry-collector:0.80.0
         artifacthub.io/links: |
           - name: Documentation
             url: https://github.com/DARK-art108/nodepulse/blob/main/README.md
-          - name: Source
+          - name: Source Code
             url: https://github.com/DARK-art108/nodepulse
         artifacthub.io/install: |
-          helm repo add nodepulse https://github.com/DARK-art108/nodepulse
-          helm install my-release nodepulse/nodepulse
+          ```bash
+          helm repo add nodepulse https://github.com/DARK-art108/nodepulse/releases/download/v0.1.0
+          helm install nodepulse nodepulse/nodepulse -n monitoring
+          ```
         artifacthub.io/readme: |
-          # NodePulse - Kubernetes Monitoring Suite
+          # NodePulse - Kubernetes Observability Stack
 
-          A comprehensive monitoring stack for Kubernetes that includes Prometheus, Grafana, Loki, Metrics Server, Trivy, and OpenTelemetry.
+          NodePulse is a plug-and-play observability stack for Kubernetes, combining Prometheus, Grafana, Loki, Trivy, OpenTelemetry, and more to deliver unified metrics, logs, traces, and security insights.
 
           ## Features
 
           - **Prometheus**: Metrics collection and alerting
           - **Grafana**: Visualization and dashboards
           - **Loki**: Log aggregation
-          - **Metrics Server**: Kubernetes metrics API implementation
           - **Trivy**: Security scanning
           - **OpenTelemetry**: Distributed tracing
 
           ## Installation
 
           ```bash
-          helm repo add nodepulse https://github.com/DARK-art108/nodepulse
-          helm install my-release nodepulse/nodepulse
+          helm repo add nodepulse https://github.com/DARK-art108/nodepulse/releases/download/v0.1.0
+          helm install nodepulse nodepulse/nodepulse -n monitoring
           ```
 
           For more information, please visit the [documentation](https://github.com/DARK-art108/nodepulse/blob/main/README.md). 
