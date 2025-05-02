@@ -10,6 +10,7 @@
 7. [Troubleshooting](#troubleshooting)
 8. [Upgrading](#upgrading)
 9. [Uninstalling](#uninstalling)
+10. [Component-Specific Guides](#component-specific-guides)
 
 ## Prerequisites
 
@@ -347,4 +348,296 @@ helm repo remove nodepulse
 4. Set up alerting rules
 5. Configure backup and restore procedures
 
-For more information, visit the [NodePulse Documentation](https://github.com/DARK-art108/nodepulse/blob/main/README.md). 
+For more information, visit the [NodePulse Documentation](https://github.com/DARK-art108/nodepulse/blob/main/README.md).
+
+## Component-Specific Guides
+
+### OpenTelemetry Configuration
+
+#### 1. Basic Setup
+```yaml
+# values.yaml
+opentelemetry-collector:
+  enabled: true
+  mode: deployment
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    processors:
+      batch:
+    exporters:
+      logging:
+        verbosity: detailed
+      prometheus:
+        endpoint: "0.0.0.0:8889"
+        namespace: "nodepulse"
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [logging]
+        metrics:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [prometheus]
+```
+
+#### 2. Instrumenting Applications
+```yaml
+# Example application deployment with OpenTelemetry
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-app
+spec:
+  template:
+    spec:
+      containers:
+      - name: example-app
+        image: example/app:latest
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://nodepulse-opentelemetry-collector.monitoring:4317"
+        - name: OTEL_SERVICE_NAME
+          value: "example-app"
+```
+
+#### 3. Accessing Traces
+```bash
+# Port-forward OpenTelemetry Collector
+kubectl port-forward -n monitoring svc/nodepulse-opentelemetry-collector 8889:8889
+
+# Access metrics
+curl http://localhost:8889/metrics
+```
+
+### Trivy Security Scanner
+
+#### 1. Basic Configuration
+```yaml
+# values.yaml
+trivy-operator:
+  vulnerabilityScanner:
+    schedule: "0 */6 * * *"
+    scanJob:
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+        limits:
+          memory: 512Mi
+          cpu: 200m
+```
+
+#### 2. Viewing Security Reports
+```bash
+# List vulnerability reports
+kubectl get vulnerabilityreports -A
+
+# List config audit reports
+kubectl get configauditreports -A
+
+# Get detailed report
+kubectl get vulnerabilityreports <pod-name> -o yaml
+```
+
+#### 3. Custom Scan Configuration
+```yaml
+# Example custom scan configuration
+apiVersion: aquasecurity.github.io/v1alpha1
+kind: ConfigAuditReport
+metadata:
+  name: example-config-audit
+spec:
+  scanner:
+    name: trivy
+    version: "0.18.0"
+  target:
+    kind: Deployment
+    name: example-deployment
+```
+
+### Metrics Server
+
+#### 1. Configuration
+```yaml
+# values.yaml
+metrics-server:
+  enabled: true
+  args:
+    - --kubelet-insecure-tls
+    - --kubelet-preferred-address-types=InternalIP
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 100m
+    limits:
+      memory: 200Mi
+      cpu: 200m
+```
+
+#### 2. Verifying Metrics
+```bash
+# Check metrics server status
+kubectl get apiservice v1beta1.metrics.k8s.io
+
+# View node metrics
+kubectl top nodes
+
+# View pod metrics
+kubectl top pods -A
+```
+
+### Loki Log Aggregation
+
+#### 1. Advanced Configuration
+```yaml
+# values.yaml
+loki:
+  persistence:
+    size: 100Gi
+  config:
+    auth_enabled: false
+    ingester:
+      chunk_idle_period: 3m
+      chunk_retain_period: 1m
+    schema_config:
+      configs:
+        - from: 2020-10-24
+          store: boltdb-shipper
+          object_store: filesystem
+          schema: v11
+          index:
+            prefix: index_
+            period: 24h
+```
+
+#### 2. Querying Logs
+```bash
+# Using LogCLI
+logcli query '{namespace="monitoring"}'
+
+# Using Grafana Explore
+# 1. Access Grafana
+# 2. Go to Explore
+# 3. Select Loki as data source
+# 4. Use LogQL queries:
+#    - {namespace="monitoring"}
+#    - {app="nodepulse"} |= "error"
+```
+
+#### 3. Log Retention
+```yaml
+# Configure log retention
+loki:
+  config:
+    limits_config:
+      retention_period: 720h  # 30 days
+      max_global_streams_per_user: 5000
+```
+
+### Prometheus Configuration
+
+#### 1. Advanced Settings
+```yaml
+# values.yaml
+prometheus:
+  server:
+    retention: 15d
+    retentionSize: "50GiB"
+    config:
+      global:
+        scrape_interval: 15s
+        evaluation_interval: 15s
+      rule_files:
+        - /etc/prometheus/rules/*.yaml
+    extraArgs:
+      web.enable-lifecycle: "true"
+```
+
+#### 2. Custom Rules
+```yaml
+# Example custom rules
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: custom-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: custom
+    rules:
+    - alert: HighMemoryUsage
+      expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: High memory usage detected
+```
+
+### Grafana Configuration
+
+#### 1. Dashboard Management
+```yaml
+# values.yaml
+grafana:
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: default
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards
+  dashboards:
+    default:
+      node-exporter:
+        gnetId: 1860
+        revision: 21
+        datasource: Prometheus
+```
+
+#### 2. Authentication
+```yaml
+# values.yaml
+grafana:
+  adminPassword: your-secure-password
+  security:
+    adminUser: admin
+    adminPassword: your-secure-password
+  auth:
+    disableLoginForm: false
+    disableSignoutMenu: false
+    oauth:
+      enabled: true
+      allowSignUp: true
+      autoLogin: false
+```
+
+#### 3. Data Sources
+```yaml
+# values.yaml
+grafana:
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://nodepulse-prometheus-server
+        access: proxy
+        isDefault: true
+      - name: Loki
+        type: loki
+        url: http://nodepulse-loki:3100
+        access: proxy
+``` 
