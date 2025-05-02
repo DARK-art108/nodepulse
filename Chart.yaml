@@ -4,9 +4,9 @@ description: NodePulse is a plug-and-play observability stack for Kubernetes, co
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
-home: https://github.com/DARK-art10/nodepulse
+home: https://github.com/DARK-art108/nodepulse
 sources:
-  - https://github.com/DARK-art10/nodepulse
+  - https://github.com/DARK-art108/nodepulse
 maintainers:
   - name: Ritesh Yadav
     email: daydreamingguy941@gmail.com
@@ -38,19 +38,19 @@ annotations:
 dependencies:
   - name: prometheus
     version: "19.7.2"
-    repository: "@prometheus-community"
+    repository: "https://prometheus-community.github.io/helm-charts"
   - name: grafana
     version: "6.57.3"
-    repository: "@grafana"
+    repository: "https://grafana.github.io/helm-charts"
   - name: loki
     version: "5.8.0"
-    repository: "@grafana"
+    repository: "https://grafana.github.io/helm-charts"
   - name: metrics-server
     version: "3.11.0"
-    repository: "@metrics-server"
+    repository: "https://kubernetes-sigs.github.io/metrics-server"
   - name: trivy-operator
     version: "0.12.0"
-    repository: "@aquasecurity"
+    repository: "https://aquasecurity.github.io/helm-charts"
   - name: opentelemetry-collector
     version: "0.50.0"
-    repository: "@open-telemetry" 
+    repository: "https://open-telemetry.github.io/opentelemetry-helm-charts" 
