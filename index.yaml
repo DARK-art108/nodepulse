@@ -1,0 +1,75 @@
+apiVersion: v1
+entries:
+  nodepulse:
+    - apiVersion: v2
+      appVersion: "1.0.0"
+      created: "2024-05-02T00:00:00.000000000Z"
+      description: NodePulse is a plug-and-play observability stack for Kubernetes, combining Prometheus, Grafana, Loki, Trivy, OpenTelemetry, and more to deliver unified metrics, logs, traces, and security insights.
+      digest: ""
+      home: https://github.com/DARK-art108/nodepulse
+      icon: https://raw.githubusercontent.com/DARK-art108/nodepulse/main/logo.png
+      keywords:
+        - monitoring
+        - prometheus
+        - grafana
+        - loki
+        - metrics
+        - security
+        - tracing
+        - kubernetes
+      maintainers:
+        - name: Ritesh Yadav
+          email: ritesh.yadav@example.com
+      name: nodepulse
+      sources:
+        - https://github.com/DARK-art108/nodepulse
+      type: application
+      urls:
+        - https://github.com/DARK-art108/nodepulse/releases/download/v0.1.0/nodepulse-0.1.0.tgz
+      version: 0.1.0
+      annotations:
+        artifacthub.io/changes: |
+          - Initial release
+        artifacthub.io/images: |
+          - name: prometheus
+            image: prom/prometheus:v2.45.0
+          - name: grafana
+            image: grafana/grafana:9.5.3
+          - name: loki
+            image: grafana/loki:2.8.2
+          - name: metrics-server
+            image: k8s.gcr.io/metrics-server/metrics-server:v0.6.3
+          - name: trivy-operator
+            image: aquasec/trivy-operator:0.12.0
+          - name: opentelemetry-collector
+            image: otel/opentelemetry-collector:0.50.0
+        artifacthub.io/links: |
+          - name: Documentation
+            url: https://github.com/DARK-art108/nodepulse/blob/main/README.md
+          - name: Source
+            url: https://github.com/DARK-art108/nodepulse
+        artifacthub.io/install: |
+          helm repo add nodepulse https://github.com/DARK-art108/nodepulse
+          helm install my-release nodepulse/nodepulse
+        artifacthub.io/readme: |
+          # NodePulse - Kubernetes Monitoring Suite
+
+          A comprehensive monitoring stack for Kubernetes that includes Prometheus, Grafana, Loki, Metrics Server, Trivy, and OpenTelemetry.
+
+          ## Features
+
+          - **Prometheus**: Metrics collection and alerting
+          - **Grafana**: Visualization and dashboards
+          - **Loki**: Log aggregation
+          - **Metrics Server**: Kubernetes metrics API implementation
+          - **Trivy**: Security scanning
+          - **OpenTelemetry**: Distributed tracing
+
+          ## Installation
+
+          ```bash
+          helm repo add nodepulse https://github.com/DARK-art108/nodepulse
+          helm install my-release nodepulse/nodepulse
+          ```
+
+          For more information, please visit the [documentation](https://github.com/DARK-art108/nodepulse/blob/main/README.md). 
