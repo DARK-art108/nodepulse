@@ -1,0 +1,56 @@
+apiVersion: v2
+name: nodepulse
+description: NodePulse is a plug-and-play observability stack for Kubernetes, combining Prometheus, Grafana, Loki, Trivy, OpenTelemetry, and more to deliver unified metrics, logs, traces, and security insights.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+home: https://github.com/DARK-art10/nodepulse
+sources:
+  - https://github.com/DARK-art10/nodepulse
+maintainers:
+  - name: Ritesh Yadav
+    email: daydreamingguy941@gmail.com
+keywords:
+  - monitoring
+  - prometheus
+  - grafana
+  - loki
+  - metrics
+  - security
+  - tracing
+  - kubernetes
+annotations:
+  artifacthub.io/changes: |
+    - Initial release
+  artifacthub.io/images: |
+    - name: prometheus
+      image: prom/prometheus:v2.45.0
+    - name: grafana
+      image: grafana/grafana:9.5.3
+    - name: loki
+      image: grafana/loki:2.8.2
+    - name: metrics-server
+      image: k8s.gcr.io/metrics-server/metrics-server:v0.6.3
+    - name: trivy-operator
+      image: aquasec/trivy-operator:0.12.0
+    - name: opentelemetry-collector
+      image: otel/opentelemetry-collector:0.50.0
+dependencies:
+  - name: prometheus
+    version: "19.7.2"
+    repository: "@prometheus-community"
+  - name: grafana
+    version: "6.57.3"
+    repository: "@grafana"
+  - name: loki
+    version: "5.8.0"
+    repository: "@grafana"
+  - name: metrics-server
+    version: "3.11.0"
+    repository: "@metrics-server"
+  - name: trivy-operator
+    version: "0.12.0"
+    repository: "@aquasecurity"
+  - name: opentelemetry-collector
+    version: "0.50.0"
+    repository: "@open-telemetry" 

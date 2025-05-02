@@ -1,0 +1,132 @@
+# Global configuration
+global:
+  namespace: monitoring
+
+# Component enable flags
+prometheus:
+  enabled: true
+  server:
+    persistentVolume:
+      size: 50Gi
+    retention: 15d
+    resources:
+      requests:
+        memory: 2Gi
+        cpu: 500m
+      limits:
+        memory: 4Gi
+        cpu: 1000m
+  alertmanager:
+    persistentVolume:
+      size: 10Gi
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+
+# Grafana configuration
+grafana:
+  enabled: true
+  adminPassword: "admin" # Change this in production
+  persistence:
+    enabled: true
+    size: 10Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://prometheus-server.monitoring.svc.cluster.local
+          access: proxy
+          isDefault: true
+        - name: Loki
+          type: loki
+          url: http://loki.monitoring.svc.cluster.local:3100
+          access: proxy
+        - name: Tempo
+          type: tempo
+          url: http://tempo.monitoring.svc.cluster.local:3200
+          access: proxy
+
+# Loki configuration
+loki:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 50Gi
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1000m
+
+# Metrics Server configuration
+metrics-server:
+  enabled: true
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 100m
+    limits:
+      memory: 200Mi
+      cpu: 200m
+
+# Trivy Operator configuration
+trivy-operator:
+  enabled: true
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+  vulnerabilityScanner:
+    enabled: true
+    schedule: "0 0 * * *" # Daily scan
+
+# OpenTelemetry Collector configuration
+opentelemetry-collector:
+  enabled: true
+  mode: daemonset
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    processors:
+      batch:
+    exporters:
+      logging:
+        verbosity: detailed
+      otlp:
+        endpoint: tempo.monitoring.svc.cluster.local:4317
+        tls:
+          insecure: true
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [logging, otlp]
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m 

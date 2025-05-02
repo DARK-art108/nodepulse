@@ -1,0 +1,21 @@
+# Patterns to ignore when building packages.
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+*.DS_Store
+.git
+.gitignore
+.vscode
+.idea
+README.md
+LICENSE
+CHANGELOG.md
+test
+tests
+examples
+docs
+ci
+crds
+templates/tests 
