@@ -640,4 +640,344 @@ grafana:
         type: loki
         url: http://nodepulse-loki:3100
         access: proxy
+```
+
+### OpenTelemetry Observability
+
+#### 1. Metrics Collection
+OpenTelemetry collects various types of metrics:
+
+##### Application Metrics
+- Request rates and latencies
+- Error rates and types
+- Resource utilization (CPU, memory)
+- Custom business metrics
+- Database query performance
+- Cache hit/miss ratios
+
+##### System Metrics
+- Container metrics
+- Process metrics
+- Network metrics
+- Disk I/O metrics
+- System calls
+
+##### Kubernetes Metrics
+- Pod lifecycle events
+- Container resource usage
+- Node resource utilization
+- Network traffic
+- Storage usage
+
+#### 2. Distributed Tracing
+Track requests across services:
+
+##### Trace Components
+- Service maps showing dependencies
+- Request flow visualization
+- Latency breakdowns
+- Error propagation
+- Context propagation
+
+##### Trace Attributes
+- Service names
+- Operation names
+- Request IDs
+- User IDs
+- Custom attributes
+
+#### 3. Log Collection
+Unified log management:
+
+##### Log Types
+- Application logs
+- System logs
+- Audit logs
+- Security logs
+- Performance logs
+
+##### Log Attributes
+- Timestamps
+- Log levels
+- Source information
+- Context data
+- Correlation IDs
+
+#### 4. Visualization in Grafana
+
+##### Pre-configured Dashboards
+1. **Service Overview Dashboard**
+   - Request rates
+   - Error rates
+   - Latency percentiles
+   - Resource usage
+   - Dependencies map
+
+2. **Trace Explorer**
+   - Service map
+   - Trace timeline
+   - Span details
+   - Error analysis
+   - Performance bottlenecks
+
+3. **Resource Monitoring**
+   - CPU usage
+   - Memory usage
+   - Network traffic
+   - Disk I/O
+   - System metrics
+
+4. **Application Performance**
+   - Response times
+   - Throughput
+   - Error rates
+   - Cache performance
+   - Database performance
+
+#### 5. Example Queries
+
+##### Metrics Queries
+```promql
+# Request rate
+rate(http_server_duration_seconds_count[5m])
+
+# Error rate
+rate(http_server_duration_seconds_count{status_code=~"5.."}[5m])
+
+# Latency
+histogram_quantile(0.95, sum(rate(http_server_duration_seconds_bucket[5m])) by (le))
+
+# Resource usage
+rate(process_cpu_seconds_total[5m])
+process_resident_memory_bytes
+```
+
+##### Log Queries
+```logql
+# Error logs
+{service="my-service"} |= "error"
+
+# High latency requests
+{service="my-service"} | json | latency > 1000
+
+# Specific user activity
+{service="my-service"} | json | user_id="12345"
+```
+
+##### Trace Queries
+```jaeger
+# Find slow requests
+service="my-service" AND duration>1s
+
+# Find errors
+service="my-service" AND error=true
+
+# Find specific operation
+service="my-service" AND operation="process_order"
+```
+
+#### 6. Alerting Examples
+
+```yaml
+# High latency alert
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: high-latency
+  namespace: monitoring
+spec:
+  groups:
+  - name: latency
+    rules:
+    - alert: HighRequestLatency
+      expr: histogram_quantile(0.95, sum(rate(http_server_duration_seconds_bucket[5m])) by (le)) > 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: High request latency detected
+        description: 95th percentile latency is above 1 second
+
+# Error rate alert
+    - alert: HighErrorRate
+      expr: rate(http_server_duration_seconds_count{status_code=~"5.."}[5m]) / rate(http_server_duration_seconds_count[5m]) > 0.05
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: High error rate detected
+        description: Error rate is above 5%
+```
+
+#### 7. Best Practices
+
+1. **Instrumentation**
+   - Use auto-instrumentation where possible
+   - Add custom spans for business logic
+   - Include relevant context in traces
+   - Use consistent naming conventions
+
+2. **Sampling**
+   - Sample traces based on volume
+   - Keep all error traces
+   - Adjust sampling rates based on importance
+   - Use dynamic sampling for high-volume services
+
+3. **Context Propagation**
+   - Propagate trace context across services
+   - Include user context where relevant
+   - Add business context to traces
+   - Maintain correlation IDs
+
+4. **Resource Management**
+   - Set appropriate retention periods
+   - Configure sampling strategies
+   - Monitor collector resource usage
+   - Use batching for efficiency
+
+### OpenTelemetry Exploration Guide
+
+#### 1. Access OpenTelemetry Collector
+
+```bash
+# Port-forward OpenTelemetry Collector
+kubectl port-forward -n monitoring svc/nodepulse-opentelemetry-collector 8889:8889
+
+# Check collector health
+curl http://localhost:8889/healthz
+
+# View collector metrics
+curl http://localhost:8889/metrics
+```
+
+#### 2. View Traces
+
+```bash
+# Port-forward Jaeger UI
+kubectl port-forward -n monitoring svc/nodepulse-jaeger-query 16686:16686
+
+# Access Jaeger UI
+# Open browser: http://localhost:16686
+
+# Query traces using curl
+curl -X GET "http://localhost:16686/api/traces?service=my-service&limit=20"
+```
+
+#### 3. Explore Metrics
+
+```bash
+# Port-forward Prometheus
+kubectl port-forward -n monitoring svc/nodepulse-prometheus-server 9090:9090
+
+# Query OpenTelemetry metrics
+curl -G "http://localhost:9090/api/v1/query" \
+  --data-urlencode "query=rate(otel_http_server_duration_seconds_count[5m])"
+
+# View service metrics
+curl -G "http://localhost:9090/api/v1/query" \
+  --data-urlencode "query=otel_service_instance_count"
+```
+
+#### 4. Check Logs
+
+```bash
+# Port-forward Loki
+kubectl port-forward -n monitoring svc/nodepulse-loki 3100:3100
+
+# Query logs using LogCLI
+logcli query '{service="my-service"}'
+
+# View specific log entries
+logcli query '{service="my-service"} |= "error"'
+```
+
+#### 5. Service Map Exploration
+
+```bash
+# View service dependencies
+curl -G "http://localhost:16686/api/dependencies" \
+  --data-urlencode "endTs=$(date +%s)000000" \
+  --data-urlencode "lookback=3600000"
+
+# Get service operations
+curl -G "http://localhost:16686/api/services/my-service/operations"
+```
+
+#### 6. Trace Analysis
+
+```bash
+# Get trace by ID
+curl -G "http://localhost:16686/api/traces/{trace-id}"
+
+# Search traces by tags
+curl -G "http://localhost:16686/api/traces" \
+  --data-urlencode "service=my-service" \
+  --data-urlencode "tag=error=true"
+```
+
+#### 7. Metrics Analysis
+
+```bash
+# Get service metrics
+curl -G "http://localhost:9090/api/v1/query" \
+  --data-urlencode "query=rate(otel_http_server_duration_seconds_sum[5m]) / rate(otel_http_server_duration_seconds_count[5m])"
+
+# Check error rates
+curl -G "http://localhost:9090/api/v1/query" \
+  --data-urlencode "query=rate(otel_http_server_duration_seconds_count{status_code=~'5..'}[5m])"
+```
+
+#### 8. Resource Usage
+
+```bash
+# Check collector resource usage
+kubectl top pod -n monitoring -l app.kubernetes.io/name=opentelemetry-collector
+
+# View collector logs
+kubectl logs -n monitoring -l app.kubernetes.io/name=opentelemetry-collector
+```
+
+#### 9. Export Data
+
+```bash
+# Export traces (requires jq)
+curl -s "http://localhost:16686/api/traces?service=my-service" | jq .
+
+# Export metrics
+curl -s "http://localhost:9090/api/v1/query_range" \
+  --data-urlencode "query=rate(otel_http_server_duration_seconds_count[5m])" \
+  --data-urlencode "start=$(date -d '1 hour ago' +%s)" \
+  --data-urlencode "end=$(date +%s)" \
+  --data-urlencode "step=15" | jq .
+```
+
+#### 10. Debugging
+
+```bash
+# Check collector configuration
+kubectl get configmap -n monitoring nodepulse-opentelemetry-collector -o yaml
+
+# View collector status
+kubectl describe pod -n monitoring -l app.kubernetes.io/name=opentelemetry-collector
+
+# Check receiver status
+curl -s http://localhost:8889/metrics | grep otelcol_receiver
+```
+
+#### 11. Common Queries
+
+```bash
+# Find slow requests
+curl -G "http://localhost:16686/api/traces" \
+  --data-urlencode "service=my-service" \
+  --data-urlencode "minDuration=1s"
+
+# Find errors
+curl -G "http://localhost:16686/api/traces" \
+  --data-urlencode "service=my-service" \
+  --data-urlencode "tag=error=true"
+
+# Get service latency
+curl -G "http://localhost:9090/api/v1/query" \
+  --data-urlencode "query=histogram_quantile(0.95, sum(rate(otel_http_server_duration_seconds_bucket[5m])) by (le))"
 ``` 
