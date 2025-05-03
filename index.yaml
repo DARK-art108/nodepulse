@@ -5,7 +5,7 @@ entries:
       appVersion: "1.0.0"
       created: "2024-03-21T12:00:00Z"
       description: A plug-and-play observability stack for Kubernetes
-      digest: sha256:5cf3ef54e451579f7d3c91eaf9af18416b7389af0610e4b0f4d3e1d59822051a
+      digest: sha256:0f2466679bca8b4b380988434b4431bd9ffdcee51b231d859d29a5250aa16b0e
       home: https://github.com/DARK-art108/nodepulse
       icon: https://raw.githubusercontent.com/DARK-art108/nodepulse/main/logo.png
       keywords:

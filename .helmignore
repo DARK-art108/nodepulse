@@ -9,7 +9,6 @@
 .gitignore
 .vscode
 .idea
-README.md
 LICENSE
 CHANGELOG.md
 test
