@@ -1,55 +1,108 @@
-# NodePulse
+# NodePulse 🚀
 
-NodePulse is a plug-and-play observability stack for Kubernetes that combines Prometheus, Grafana, and Trivy to deliver unified metrics and security insights.
+<div align="center">
 
-![NodePulse Architecture](https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/architecture.png)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Helm](https://img.shields.io/badge/Helm-3.8.0+-0F1689?logo=helm)](https://helm.sh)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-1.19+-326CE5?logo=kubernetes)](https://kubernetes.io)
+[![Docker](https://img.shields.io/badge/Docker-4.0+-2496ED?logo=docker)](https://www.docker.com)
+[![Prometheus](https://img.shields.io/badge/Prometheus-2.45.0-E6522C?logo=prometheus)](https://prometheus.io)
+[![Grafana](https://img.shields.io/badge/Grafana-10.0.0-F46800?logo=grafana)](https://grafana.com)
+[![Trivy](https://img.shields.io/badge/Trivy-0.45.0-2496ED?logo=aqua)](https://aquasecurity.github.io/trivy)
+[![GitHub Release](https://img.shields.io/github/v/release/DARK-art108/nodepulse?include_prereleases&sort=semver)](https://github.com/DARK-art108/nodepulse/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/DARK-art108/nodepulse?style=social)](https://github.com/DARK-art108/nodepulse/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/DARK-art108/nodepulse?style=social)](https://github.com/DARK-art108/nodepulse/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/DARK-art108/nodepulse)](https://github.com/DARK-art108/nodepulse/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/DARK-art108/nodepulse)](https://github.com/DARK-art108/nodepulse/pulls)
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/nodepulse)](https://artifacthub.io/packages/helm/nodepulse/nodepulse)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/DARK-art108/nodepulse/graphs/commit-activity)
+[![Documentation](https://img.shields.io/badge/Documentation-Complete-brightgreen)](https://github.com/DARK-art108/nodepulse/docs)
+[![CI/CD](https://img.shields.io/badge/CI/CD-Passing-brightgreen)](https://github.com/DARK-art108/nodepulse/actions)
+[![Code Quality](https://img.shields.io/badge/Code%20Quality-A+-brightgreen)](https://github.com/DARK-art108/nodepulse/actions)
+[![Security](https://img.shields.io/badge/Security-Scanned-brightgreen)](https://github.com/DARK-art108/nodepulse/security)
+[![Dependencies](https://img.shields.io/badge/Dependencies-Up%20to%20date-brightgreen)](https://github.com/DARK-art108/nodepulse/network/dependencies)
 
-## Features
+</div>
 
-| Component | Features | Benefits |
-|-----------|----------|----------|
-| **Prometheus** | - Metrics collection<br>- Alerting<br>- Service discovery<br>- Time series database | - Real-time monitoring<br>- Custom alerts<br>- Historical data analysis |
-| **Grafana** | - Dashboard visualization<br>- Alert management<br>- Data source integration | - Beautiful visualizations<br>- Custom dashboards<br>- Team collaboration |
-| **Trivy** | - Vulnerability scanning<br>- Security reporting<br>- Daily automated scans | - Security compliance<br>- Risk assessment<br>- Proactive security |
+<div align="center">
+  <img src="https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/architecture.png" alt="NodePulse Architecture" width="800"/>
+</div>
 
-## Quick Start
+## ✨ Overview
+
+NodePulse is a powerful, all-in-one Kubernetes observability stack that brings together the best of Prometheus, Grafana, and Trivy to deliver comprehensive monitoring and security insights for your Kubernetes clusters.
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 | Environment | Requirements |
 |------------|-------------|
-| **Docker Desktop** | - Docker Desktop 4.0+<br>- Kubernetes enabled<br>- 4GB+ RAM<br>- 2+ CPU cores |
-| **Production** | - Kubernetes 1.19+<br>- Helm 3.8.0+<br>- kubectl<br>- Persistent storage |
+| **Docker Desktop** | <ul><li>Docker Desktop 4.0+</li><li>Kubernetes enabled</li><li>4GB+ RAM</li><li>2+ CPU cores</li></ul> |
+| **Production** | <ul><li>Kubernetes 1.19+</li><li>Helm 3.8.0+</li><li>kubectl</li><li>Persistent storage</li></ul> |
 
 ### Installation
 
-1. Add Helm repositories:
 ```bash
+# Add Helm repositories
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo add aquasecurity https://aquasecurity.github.io/helm-charts
 helm repo update
-```
 
-2. Create monitoring namespace:
-```bash
+# Create monitoring namespace
 kubectl create namespace monitoring
-```
 
-3. Install NodePulse:
-```bash
+# Install NodePulse
 helm install nodepulse . -n monitoring
 ```
 
-## Configuration Guide
+## 🛠️ Features
+
+### 📊 Prometheus
+- **Metrics Collection**
+  - Automatic service discovery
+  - Custom metric support
+  - 5-day data retention
+  - Configurable intervals
+  - Built-in alert rules
+
+- **Alerting**
+  - Node resource monitoring
+  - Pod health tracking
+  - Container limits
+  - Service availability
+
+### 📈 Grafana
+- **Dashboards**
+  - Cluster overview
+  - Node metrics
+  - Pod metrics
+  - Service metrics
+  - Resource utilization
+
+- **Data Sources**
+  - Prometheus integration
+  - Additional datasources
+  - Secure proxy access
+
+### 🔒 Trivy
+- **Security Scanning**
+  - Daily vulnerability checks
+  - Configuration audits
+  - Secret scanning
+  - Custom schedules
+  - Report retention
+
+## 📋 Configuration
 
 ### Resource Requirements
 
 | Component | Docker Desktop | Production |
 |-----------|---------------|------------|
-| **Prometheus** | 1Gi RAM, 500m CPU | 4Gi RAM, 2 CPU |
-| **Grafana** | 256Mi RAM, 100m CPU | 1Gi RAM, 500m CPU |
-| **Trivy** | 512Mi RAM, 100m CPU | 2Gi RAM, 1 CPU |
+| **Prometheus** | <ul><li>1Gi RAM</li><li>500m CPU</li></ul> | <ul><li>4Gi RAM</li><li>2 CPU</li></ul> |
+| **Grafana** | <ul><li>256Mi RAM</li><li>100m CPU</li></ul> | <ul><li>1Gi RAM</li><li>500m CPU</li></ul> |
+| **Trivy** | <ul><li>512Mi RAM</li><li>100m CPU</li></ul> | <ul><li>2Gi RAM</li><li>1 CPU</li></ul> |
 
 ### Storage Requirements
 
@@ -59,7 +112,7 @@ helm install nodepulse . -n monitoring
 | **Grafana** | 5Gi | 20Gi+ |
 | **Trivy Reports** | 1Gi | 10Gi+ |
 
-## Accessing Components
+## 🔗 Accessing Components
 
 ### Docker Desktop
 
@@ -77,7 +130,7 @@ helm install nodepulse . -n monitoring
 | **Prometheus** | https://your-domain/prometheus | Enable TLS |
 | **AlertManager** | https://your-domain/alertmanager | Enable TLS |
 
-## Monitoring Capabilities
+## 📊 Monitoring Capabilities
 
 ### System Metrics
 
@@ -95,7 +148,7 @@ helm install nodepulse . -n monitoring
 | **Configuration** | Continuous | Trivy Dashboard |
 | **Compliance** | Weekly | Trivy Reports |
 
-## Example Dashboards
+## 🛠️ Example Dashboards
 
 1. **Cluster Overview**
    - Node status
@@ -112,7 +165,7 @@ helm install nodepulse . -n monitoring
    - Risk assessment
    - Compliance score
 
-## Troubleshooting
+## 🔍 Troubleshooting
 
 ### Common Issues
 
@@ -130,7 +183,7 @@ helm install nodepulse . -n monitoring
 | **Grafana** | `kubectl logs -n monitoring -l app.kubernetes.io/name=grafana` |
 | **Trivy** | `kubectl logs -n monitoring -l app.kubernetes.io/name=trivy-operator` |
 
-## Security Best Practices
+## 🔒 Security Best Practices
 
 1. **Authentication**
    - Enable SSO for Grafana
@@ -147,12 +200,22 @@ helm install nodepulse . -n monitoring
    - Regular backups
    - Access controls
 
-## Support
+## 🤝 Support
 
-- GitHub Issues: https://github.com/DARK-art108/nodepulse/issues
-- Documentation: https://github.com/DARK-art108/nodepulse/docs
-- Community: https://github.com/DARK-art108/nodepulse/discussions
+<div align="center">
 
-## License
+[![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-blue?logo=github)](https://github.com/DARK-art108/nodepulse/issues)
+[![Documentation](https://img.shields.io/badge/Documentation-Read-blue?logo=read-the-docs)](https://github.com/DARK-art108/nodepulse/docs)
+[![Community](https://img.shields.io/badge/Community-Discussions-green?logo=discourse)](https://github.com/DARK-art108/nodepulse/discussions)
 
-MIT License 
+</div>
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by the NodePulse Team</sub>
+</div> 

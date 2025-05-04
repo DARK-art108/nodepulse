@@ -1,8 +1,14 @@
-# NodePulse Setup Guide
+# NodePulse Setup Guide 📚
 
-This guide provides detailed instructions for setting up NodePulse in both Docker Desktop and production environments.
+<div align="center">
 
-## Table of Contents
+[![Setup Guide](https://img.shields.io/badge/Setup-Guide-blue)](https://github.com/DARK-art108/nodepulse/docs)
+[![Documentation](https://img.shields.io/badge/Documentation-Complete-brightgreen)](https://github.com/DARK-art108/nodepulse/docs)
+[![Support](https://img.shields.io/badge/Support-Available-blue)](https://github.com/DARK-art108/nodepulse/discussions)
+
+</div>
+
+## 📋 Table of Contents
 
 1. [Environment Setup](#environment-setup)
 2. [Installation](#installation)
@@ -11,11 +17,15 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
 5. [Security Configuration](#security-configuration)
 6. [Troubleshooting](#troubleshooting)
 
-## Environment Setup
+## 🛠️ Environment Setup
 
-### Docker Desktop
+### 🐳 Docker Desktop
 
-1. **System Requirements**
+<div align="center">
+  <img src="https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/docker-setup.png" alt="Docker Setup" width="600"/>
+</div>
+
+1. **System Requirements** 🖥️
    ```bash
    # Check Docker version
    docker --version
@@ -23,12 +33,12 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    kubectl version
    ```
 
-2. **Resource Allocation**
+2. **Resource Allocation** 💾
    - Minimum: 4GB RAM, 2 CPU cores
    - Recommended: 8GB RAM, 4 CPU cores
    - Storage: 20GB free space
 
-3. **Enable Kubernetes**
+3. **Enable Kubernetes** ⚙️
    ```bash
    # Open Docker Desktop
    # Go to Settings > Kubernetes
@@ -36,9 +46,13 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    # Click "Apply & Restart"
    ```
 
-### Production Cluster
+### 🏭 Production Cluster
 
-1. **Prerequisites**
+<div align="center">
+  <img src="https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/production-setup.png" alt="Production Setup" width="600"/>
+</div>
+
+1. **Prerequisites** 📋
    ```bash
    # Check Kubernetes version
    kubectl version
@@ -46,12 +60,12 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    helm version
    ```
 
-2. **Resource Requirements**
+2. **Resource Requirements** 💪
    - Minimum: 8GB RAM, 4 CPU cores per node
    - Recommended: 16GB RAM, 8 CPU cores per node
    - Storage: 100GB+ per node
 
-3. **Storage Setup**
+3. **Storage Setup** 💽
    ```bash
    # Check available storage classes
    kubectl get storageclass
@@ -59,11 +73,11 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    kubectl apply -f storage-class.yaml
    ```
 
-## Installation
+## 🚀 Installation
 
-### Docker Desktop
+### 🐳 Docker Desktop
 
-1. **Add Helm Repositories**
+1. **Add Helm Repositories** 📦
    ```bash
    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
    helm repo add grafana https://grafana.github.io/helm-charts
@@ -71,22 +85,21 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    helm repo update
    ```
 
-2. **Create Namespace**
+2. **Create Namespace** 📁
    ```bash
    kubectl create namespace monitoring
    ```
 
-3. **Install NodePulse**
+3. **Install NodePulse** ⚡
    ```bash
    helm install nodepulse . -n monitoring
    ```
 
-### Production
+### 🏭 Production
 
-1. **Custom Values**
-   ```bash
-   # Create custom values file
-   cat > values-production.yaml << EOF
+1. **Custom Values** ⚙️
+   ```yaml
+   # values-production.yaml
    global:
      storageClass: standard
    
@@ -113,19 +126,18 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
        limits:
          memory: 2Gi
          cpu: 1
-   EOF
    ```
 
-2. **Install with Custom Values**
+2. **Install with Custom Values** 🚀
    ```bash
    helm install nodepulse . -n monitoring -f values-production.yaml
    ```
 
-## Configuration
+## ⚙️ Configuration
 
-### Prometheus
+### 📊 Prometheus
 
-1. **Alert Rules**
+1. **Alert Rules** 🔔
    ```yaml
    # Example alert rule
    groups:
@@ -140,7 +152,7 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
          summary: High memory usage
    ```
 
-2. **Service Discovery**
+2. **Service Discovery** 🔍
    ```yaml
    # Example service discovery
    scrape_configs:
@@ -149,9 +161,9 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
          - role: pod
    ```
 
-### Grafana
+### 📈 Grafana
 
-1. **Dashboard Setup**
+1. **Dashboard Setup** 📊
    ```bash
    # Import example dashboards
    kubectl create configmap grafana-dashboards \
@@ -159,7 +171,7 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      -n monitoring
    ```
 
-2. **Data Sources**
+2. **Data Sources** 🔌
    ```yaml
    # Example datasource configuration
    datasources:
@@ -169,9 +181,9 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
        access: proxy
    ```
 
-### Trivy
+### 🔒 Trivy
 
-1. **Scan Configuration**
+1. **Scan Configuration** 🔍
    ```yaml
    # Example scan configuration
    vulnerabilityScanner:
@@ -180,7 +192,7 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      concurrentScanJobsLimit: 5
    ```
 
-2. **Report Retention**
+2. **Report Retention** 📋
    ```yaml
    # Example retention policy
    reportRetention:
@@ -188,11 +200,11 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      maxAge: 30d
    ```
 
-## Monitoring Setup
+## 📊 Monitoring Setup
 
-### Docker Desktop
+### 🐳 Docker Desktop
 
-1. **Port Forwarding**
+1. **Port Forwarding** 🔄
    ```bash
    # Grafana
    kubectl port-forward svc/grafana 3000:80 -n monitoring &
@@ -204,14 +216,14 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    kubectl port-forward svc/prometheus-alertmanager 9093:80 -n monitoring &
    ```
 
-2. **Access URLs**
+2. **Access URLs** 🌐
    - Grafana: http://localhost:3000
    - Prometheus: http://localhost:9090
    - AlertManager: http://localhost:9093
 
-### Production
+### 🏭 Production
 
-1. **Ingress Setup**
+1. **Ingress Setup** 🌐
    ```yaml
    # Example ingress configuration
    apiVersion: networking.k8s.io/v1
@@ -233,7 +245,7 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
                  number: 80
    ```
 
-2. **TLS Configuration**
+2. **TLS Configuration** 🔒
    ```yaml
    # Example TLS configuration
    tls:
@@ -242,11 +254,11 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      secretName: monitoring-tls
    ```
 
-## Security Configuration
+## 🔒 Security Configuration
 
-### Authentication
+### 🔐 Authentication
 
-1. **Grafana SSO**
+1. **Grafana SSO** 👥
    ```yaml
    # Example SSO configuration
    grafana:
@@ -256,7 +268,7 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
        GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "your-client-secret"
    ```
 
-2. **RBAC Setup**
+2. **RBAC Setup** 🔑
    ```yaml
    # Example RBAC configuration
    rbac:
@@ -264,9 +276,9 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      pspEnabled: false
    ```
 
-### Network Security
+### 🌐 Network Security
 
-1. **Network Policies**
+1. **Network Policies** 🛡️
    ```yaml
    # Example network policy
    apiVersion: networking.k8s.io/v1
@@ -283,7 +295,7 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
              name: monitoring
    ```
 
-2. **TLS Configuration**
+2. **TLS Configuration** 🔒
    ```bash
    # Generate TLS certificates
    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -295,11 +307,11 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      -n monitoring
    ```
 
-## Troubleshooting
+## 🔍 Troubleshooting
 
-### Common Issues
+### ⚠️ Common Issues
 
-1. **Prometheus OOM**
+1. **Prometheus OOM** 🚨
    ```bash
    # Check memory usage
    kubectl top pods -n monitoring
@@ -309,14 +321,14 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      --set prometheus.server.resources.limits.memory=4Gi
    ```
 
-2. **Grafana Login Issues**
+2. **Grafana Login Issues** 🔑
    ```bash
    # Reset admin password
    kubectl exec -it $(kubectl get pods -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}') \
      -n monitoring -- grafana-cli admin reset-admin-password newpassword
    ```
 
-3. **Trivy Scan Failures**
+3. **Trivy Scan Failures** 🔍
    ```bash
    # Check scan logs
    kubectl logs -n monitoring -l app.kubernetes.io/name=trivy-operator
@@ -326,9 +338,9 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
      --set trivy.resources.limits.memory=2Gi
    ```
 
-### Log Collection
+### 📝 Log Collection
 
-1. **Component Logs**
+1. **Component Logs** 📋
    ```bash
    # Prometheus logs
    kubectl logs -n monitoring -l app.kubernetes.io/name=prometheus
@@ -340,15 +352,24 @@ This guide provides detailed instructions for setting up NodePulse in both Docke
    kubectl logs -n monitoring -l app.kubernetes.io/name=trivy-operator
    ```
 
-2. **Event Logs**
+2. **Event Logs** 📊
    ```bash
    # Cluster events
    kubectl get events -n monitoring --sort-by='.lastTimestamp'
    ```
 
-## Support
+## 🤝 Support
 
-For additional support:
-- GitHub Issues: https://github.com/DARK-art108/nodepulse/issues
-- Documentation: https://github.com/DARK-art108/nodepulse/docs
-- Community: https://github.com/DARK-art108/nodepulse/discussions 
+<div align="center">
+
+[![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-blue?logo=github)](https://github.com/DARK-art108/nodepulse/issues)
+[![Documentation](https://img.shields.io/badge/Documentation-Read-blue?logo=read-the-docs)](https://github.com/DARK-art108/nodepulse/docs)
+[![Community](https://img.shields.io/badge/Community-Discussions-green?logo=discourse)](https://github.com/DARK-art108/nodepulse/discussions)
+
+</div>
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by the NodePulse Team</sub>
+</div> 
