@@ -1,46 +1,80 @@
-# Global configuration
-global:
-  namespace: monitoring
+# Default values for nodepulse.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
-# Component enable flags
+# Global settings
+global:
+  # Enable or disable all components
+  enabled: true
+  # Set the default storage class
+  storageClass: standard
+  # Set the default image pull policy
+  imagePullPolicy: IfNotPresent
+  # Set the default image registry
+  imageRegistry: ""
+  # Set the default image tag
+  imageTag: ""
+
+# Prometheus configuration
 prometheus:
   enabled: true
   server:
     persistentVolume:
-      size: 50Gi
-    retention: 15d
-    resources:
-      requests:
-        memory: 2Gi
-        cpu: 500m
-      limits:
-        memory: 4Gi
-        cpu: 1000m
-  alertmanager:
-    persistentVolume:
       size: 10Gi
+    retention: 5d
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
         memory: 512Mi
         cpu: 200m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+  alertmanager:
+    enabled: true
+    persistentVolume:
+      size: 2Gi
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 256Mi
+        cpu: 200m
+  pushgateway:
+    enabled: true
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 256Mi
+        cpu: 200m
+  kubeStateMetrics:
+    enabled: true
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 256Mi
+        cpu: 200m
+  nodeExporter:
+    enabled: false
 
 # Grafana configuration
 grafana:
   enabled: true
-  adminPassword: "admin" # Change this in production
+  adminPassword: admin
   persistence:
     enabled: true
-    size: 10Gi
+    size: 5Gi
   resources:
     requests:
+      memory: 128Mi
+      cpu: 50m
+    limits:
       memory: 256Mi
       cpu: 100m
-    limits:
-      memory: 512Mi
-      cpu: 200m
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -50,83 +84,28 @@ grafana:
           url: http://prometheus-server.monitoring.svc.cluster.local
           access: proxy
           isDefault: true
-        - name: Loki
-          type: loki
-          url: http://loki.monitoring.svc.cluster.local:3100
-          access: proxy
-        - name: Tempo
-          type: tempo
-          url: http://tempo.monitoring.svc.cluster.local:3200
-          access: proxy
-
-# Loki configuration
-loki:
-  enabled: true
-  persistence:
-    enabled: true
-    size: 50Gi
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 500m
-    limits:
-      memory: 2Gi
-      cpu: 1000m
-
-# Metrics Server configuration
-metrics-server:
-  enabled: true
-  resources:
-    requests:
-      memory: 100Mi
-      cpu: 100m
-    limits:
-      memory: 200Mi
-      cpu: 200m
 
 # Trivy Operator configuration
-trivy-operator:
+trivy:
   enabled: true
   resources:
     requests:
       memory: 256Mi
-      cpu: 100m
+      cpu: 50m
     limits:
       memory: 512Mi
-      cpu: 200m
+      cpu: 100m
   vulnerabilityScanner:
     enabled: true
-    schedule: "0 0 * * *" # Daily scan
+    schedule: "0 0 * * *"
+  concurrentScanJobsLimit: 2
 
-# OpenTelemetry Collector configuration
+# Disabled components
+metrics-server:
+  enabled: false
+
+loki:
+  enabled: false
+
 opentelemetry-collector:
-  enabled: true
-  mode: daemonset
-  config:
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-          http:
-    processors:
-      batch:
-    exporters:
-      logging:
-        verbosity: detailed
-      otlp:
-        endpoint: tempo.monitoring.svc.cluster.local:4317
-        tls:
-          insecure: true
-    service:
-      pipelines:
-        traces:
-          receivers: [otlp]
-          processors: [batch]
-          exporters: [logging, otlp]
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 100m
-    limits:
-      memory: 512Mi
-      cpu: 200m 
+  enabled: false 

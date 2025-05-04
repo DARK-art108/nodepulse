@@ -1,15 +1,28 @@
 # Patterns to ignore when building packages.
+# This file supports glob patterns, relative path matching, and
+# negation (prefixed with !). Only one pattern per line.
+.DS_Store
+# Common VCS dirs
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+# Common backup files
 *.swp
-*.swo
 *.bak
 *.tmp
-*.log
-*.DS_Store
-.git
-.gitignore
-.vscode
-.idea
-LICENSE
+*.orig
+*~
+# Various IDEs
+.project
+.idea/
+*.tmproj
+.vscode/
+# Artifact Hub specific
+artifacthub-repo.yml
 CHANGELOG.md
 test
 tests

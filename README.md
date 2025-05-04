@@ -1,37 +1,37 @@
-# NodePulse - Kubernetes Monitoring Suite
+# NodePulse
 
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/nodepulse)](https://artifacthub.io/packages/helm/nodepulse/nodepulse)
+NodePulse is a plug-and-play observability stack for Kubernetes that combines Prometheus, Grafana, and Trivy to deliver unified metrics and security insights.
 
-NodePulse is a plug-and-play observability stack for Kubernetes, combining Prometheus, Grafana, Loki, Trivy, OpenTelemetry, and more to deliver unified metrics, logs, traces, and security insights.
+![NodePulse Architecture](https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/architecture.png)
 
 ## Features
 
-- **Prometheus**: Metrics collection and alerting
-- **Grafana**: Visualization and dashboards
-- **Loki**: Log aggregation
-- **Metrics Server**: Kubernetes metrics API implementation
-- **Trivy**: Security scanning
-- **OpenTelemetry**: Distributed tracing
+| Component | Features | Benefits |
+|-----------|----------|----------|
+| **Prometheus** | - Metrics collection<br>- Alerting<br>- Service discovery<br>- Time series database | - Real-time monitoring<br>- Custom alerts<br>- Historical data analysis |
+| **Grafana** | - Dashboard visualization<br>- Alert management<br>- Data source integration | - Beautiful visualizations<br>- Custom dashboards<br>- Team collaboration |
+| **Trivy** | - Vulnerability scanning<br>- Security reporting<br>- Daily automated scans | - Security compliance<br>- Risk assessment<br>- Proactive security |
 
-## Prerequisites
+## Quick Start
 
-- Kubernetes cluster (version 1.16 or later)
-- Helm 3.x
-- kubectl configured to access your cluster
+### Prerequisites
 
-## Installation
+| Environment | Requirements |
+|------------|-------------|
+| **Docker Desktop** | - Docker Desktop 4.0+<br>- Kubernetes enabled<br>- 4GB+ RAM<br>- 2+ CPU cores |
+| **Production** | - Kubernetes 1.19+<br>- Helm 3.8.0+<br>- kubectl<br>- Persistent storage |
 
-1. Add the required Helm repositories:
+### Installation
+
+1. Add Helm repositories:
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add grafana https://grafana.github.io/helm-charts
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
 helm repo add aquasecurity https://aquasecurity.github.io/helm-charts
-helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
 helm repo update
 ```
 
-2. Create the monitoring namespace:
+2. Create monitoring namespace:
 ```bash
 kubectl create namespace monitoring
 ```
@@ -41,74 +41,118 @@ kubectl create namespace monitoring
 helm install nodepulse . -n monitoring
 ```
 
-## Configuration
+## Configuration Guide
 
-The following table lists the configurable parameters of the NodePulse chart and their default values.
+### Resource Requirements
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `prometheus.enabled` | Enable Prometheus | `true` |
-| `grafana.enabled` | Enable Grafana | `true` |
-| `loki.enabled` | Enable Loki | `true` |
-| `metrics-server.enabled` | Enable Metrics Server | `true` |
-| `trivy-operator.enabled` | Enable Trivy Operator | `true` |
-| `opentelemetry-collector.enabled` | Enable OpenTelemetry Collector | `true` |
+| Component | Docker Desktop | Production |
+|-----------|---------------|------------|
+| **Prometheus** | 1Gi RAM, 500m CPU | 4Gi RAM, 2 CPU |
+| **Grafana** | 256Mi RAM, 100m CPU | 1Gi RAM, 500m CPU |
+| **Trivy** | 512Mi RAM, 100m CPU | 2Gi RAM, 1 CPU |
 
-For more configuration options, please refer to the [values.yaml](values.yaml) file.
+### Storage Requirements
 
-## Accessing the Components
+| Component | Docker Desktop | Production |
+|-----------|---------------|------------|
+| **Prometheus** | 10Gi | 50Gi+ |
+| **Grafana** | 5Gi | 20Gi+ |
+| **Trivy Reports** | 1Gi | 10Gi+ |
 
-- **Grafana**: `http://<grafana-service-ip>:3000`
-  - Default credentials: admin/admin (change in production)
-- **Prometheus**: `http://<prometheus-service-ip>:9090`
-- **Loki**: `http://<loki-service-ip>:3100`
+## Accessing Components
 
-## Updating NodePulse
+### Docker Desktop
 
-To update NodePulse with new values:
+| Component | Access Method | Default Credentials |
+|-----------|--------------|---------------------|
+| **Grafana** | http://localhost:3000 | admin/admin |
+| **Prometheus** | http://localhost:9090 | - |
+| **AlertManager** | http://localhost:9093 | - |
 
-```bash
-helm upgrade nodepulse . -n monitoring
-```
+### Production
 
-## Uninstalling
+| Component | Access Method | Security Notes |
+|-----------|--------------|----------------|
+| **Grafana** | https://your-domain/grafana | Configure SSO |
+| **Prometheus** | https://your-domain/prometheus | Enable TLS |
+| **AlertManager** | https://your-domain/alertmanager | Enable TLS |
 
-To uninstall NodePulse:
+## Monitoring Capabilities
 
-```bash
-helm uninstall nodepulse -n monitoring
-kubectl delete namespace monitoring
-```
+### System Metrics
 
-## Security Considerations
+| Metric Type | Description | Collection Method |
+|------------|-------------|-------------------|
+| **Cluster State** | Node status, pod states | kube-state-metrics |
+| **Resource Usage** | CPU, memory, network | Prometheus |
+| **Application Metrics** | Custom metrics | Prometheus client |
 
-1. Change the default Grafana admin password in production
-2. Configure proper TLS for all components
-3. Set up proper RBAC and network policies
-4. Configure proper resource limits based on your cluster size
+### Security Scanning
 
-## Contributing
+| Scan Type | Frequency | Report Location |
+|-----------|-----------|-----------------|
+| **Vulnerability** | Daily | Trivy Dashboard |
+| **Configuration** | Continuous | Trivy Dashboard |
+| **Compliance** | Weekly | Trivy Reports |
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+## Example Dashboards
 
-## License
+1. **Cluster Overview**
+   - Node status
+   - Resource usage
+   - Pod distribution
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+2. **Application Health**
+   - Service status
+   - Error rates
+   - Response times
 
-## Monitoring and Alerts
-
-NodePulse comes with basic monitoring and alerting configured. You can customize these by:
-
-1. Modifying Prometheus alert rules
-2. Creating custom Grafana dashboards
-3. Configuring alert notifications in Grafana
-4. Setting up log-based alerts in Loki
+3. **Security Dashboard**
+   - Vulnerability status
+   - Risk assessment
+   - Compliance score
 
 ## Troubleshooting
 
-Common issues and solutions:
+### Common Issues
 
-1. **Storage Issues**: Ensure your cluster has proper storage classes configured
-2. **Resource Constraints**: Adjust resource limits in values.yaml if components are failing
-3. **Network Issues**: Check network policies and service configurations
-4. **Authentication Issues**: Verify RBAC configurations and service account permissions 
+| Issue | Solution |
+|-------|----------|
+| **Prometheus OOM** | Increase memory limits |
+| **Grafana Login Issues** | Reset admin password |
+| **Trivy Scan Failures** | Check resource limits |
+
+### Logs Location
+
+| Component | Log Command |
+|-----------|-------------|
+| **Prometheus** | `kubectl logs -n monitoring -l app.kubernetes.io/name=prometheus` |
+| **Grafana** | `kubectl logs -n monitoring -l app.kubernetes.io/name=grafana` |
+| **Trivy** | `kubectl logs -n monitoring -l app.kubernetes.io/name=trivy-operator` |
+
+## Security Best Practices
+
+1. **Authentication**
+   - Enable SSO for Grafana
+   - Configure RBAC
+   - Use service accounts
+
+2. **Network Security**
+   - Enable TLS
+   - Configure network policies
+   - Use private networks
+
+3. **Data Protection**
+   - Encrypt sensitive data
+   - Regular backups
+   - Access controls
+
+## Support
+
+- GitHub Issues: https://github.com/DARK-art108/nodepulse/issues
+- Documentation: https://github.com/DARK-art108/nodepulse/docs
+- Community: https://github.com/DARK-art108/nodepulse/discussions
+
+## License
+
+MIT License 

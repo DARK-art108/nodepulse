@@ -3,296 +3,50 @@ entries:
   nodepulse:
     - apiVersion: v2
       appVersion: "1.0.0"
-      created: "2024-03-21T12:00:00Z"
+      created: "2025-05-04T23:10:18.000Z"
       description: A plug-and-play observability stack for Kubernetes
-      digest: sha256:0f2466679bca8b4b380988434b4431bd9ffdcee51b231d859d29a5250aa16b0e
+      digest: sha256:a21dcdda4930216bfcc8cc245d8fc7e24e637848acb93d38ebd0fdc03a8ae37b
       home: https://github.com/DARK-art108/nodepulse
-      icon: https://raw.githubusercontent.com/DARK-art108/nodepulse/main/logo.png
       keywords:
         - monitoring
-        - observability
-        - kubernetes
         - prometheus
         - grafana
-        - loki
-        - trivy
-        - opentelemetry
+        - security
+        - kubernetes
+        - metrics
+        - alerting
+        - vulnerability
+        - scanning
       maintainers:
-        - name: DARK-art108
-          email: daydreamingguy941@gmail.com
+        - email: daydreamingguy941@gmail.com
+          name: Ritesh Yadav
       name: nodepulse
       sources:
         - https://github.com/DARK-art108/nodepulse
       type: application
       urls:
-        - https://github.com/DARK-art108/nodepulse/releases/download/v0.1.0/nodepulse-0.1.0.tgz
+        - nodepulse-0.1.0.tgz
       version: 0.1.0
       annotations:
         artifacthub.io/changes: |
-          - Initial release of NodePulse monitoring stack
+          - Initial release
         artifacthub.io/images: |
           - name: prometheus
             image: prom/prometheus:v2.45.0
           - name: grafana
-            image: grafana/grafana:10.0.0
-          - name: loki
-            image: grafana/loki:2.8.0
+            image: grafana/grafana:9.5.3
           - name: trivy-operator
-            image: aquasec/trivy-operator:0.18.0
-          - name: opentelemetry-collector
-            image: otel/opentelemetry-collector:0.80.0
-        artifacthub.io/links: |
-          - name: Documentation
-            url: https://github.com/DARK-art108/nodepulse/blob/main/README.md
-          - name: Source Code
-            url: https://github.com/DARK-art108/nodepulse
-        artifacthub.io/install: |
-          ```bash
-          helm repo add nodepulse https://github.com/DARK-art108/nodepulse/releases/download/v0.1.0
-          helm install nodepulse nodepulse/nodepulse -n monitoring
-          ```
-        artifacthub.io/readme: |
-          # NodePulse - Kubernetes Monitoring Suite
-
-          [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/nodepulse)](https://artifacthub.io/packages/helm/nodepulse/nodepulse)
-
-          ## Introduction
-
-          NodePulse is a comprehensive Kubernetes observability stack that combines multiple open-source tools to provide a unified monitoring solution. This Helm chart packages Prometheus, Grafana, Loki, Trivy, and OpenTelemetry into a single, easy-to-deploy solution.
-
-          ## Prerequisites
-
-          - Kubernetes 1.16+
-          - Helm 3.x
-          - kubectl configured to access your cluster
-          - Minimum cluster resources:
-            - 4 CPU cores
-            - 8GB RAM
-            - 100GB storage
-
-          ## Installation
-
-          ### Add the Helm Repository
-
-          ```bash
-          helm repo add nodepulse https://github.com/DARK-art108/nodepulse/releases/download/v0.1.0
-          helm repo update
-          ```
-
-          ### Install the Chart
-
-          ```bash
-          # Create monitoring namespace
-          kubectl create namespace monitoring
-
-          # Install with default values
-          helm install nodepulse nodepulse/nodepulse -n monitoring
-          ```
-
-          ## Configuration
-
-          ### Key Configuration Parameters
-
-          | Parameter | Description | Default |
-          |-----------|-------------|---------|
-          | `prometheus.server.retention` | Prometheus data retention period | 15d |
-          | `grafana.adminPassword` | Grafana admin password | admin |
-          | `loki.persistence.size` | Loki storage size | 50Gi |
-          | `trivy-operator.vulnerabilityScanner.schedule` | Security scan schedule | 0 0 * * * |
-
-          ### Custom Installation
-
-          ```bash
-          helm install nodepulse nodepulse/nodepulse -n monitoring \
-            --set prometheus.server.retention=30d \
-            --set grafana.adminPassword=your-secure-password \
-            --set loki.persistence.size=100Gi \
-            --set trivy-operator.vulnerabilityScanner.schedule="0 */6 * * *"
-          ```
-
-          ### Resource Configuration
-
-          ```yaml
-          # Example custom values.yaml
-          prometheus:
-            server:
-              resources:
-                requests:
-                  memory: 2Gi
-                  cpu: 500m
-                limits:
-                  memory: 4Gi
-                  cpu: 1000m
-
-          grafana:
-            resources:
-              requests:
-                memory: 256Mi
-                cpu: 100m
-              limits:
-                memory: 512Mi
-                cpu: 200m
-          ```
-
-          ## Components
-
-          ### Prometheus
-          - Metrics collection and storage
-          - Alerting rules
-          - Service discovery
-          - Default retention: 15 days
-
-          ### Grafana
-          - Visualization dashboards
-          - Alert management
-          - Default credentials:
-            - Username: admin
-            - Password: (set during installation)
-
-          ### Loki
-          - Log aggregation
-          - LogQL query language
-          - Default storage: 50Gi
-
-          ### Trivy Operator
-          - Vulnerability scanning
-          - Configuration auditing
-          - Default scan schedule: Daily
-
-          ### OpenTelemetry
-          - Distributed tracing
-          - Metrics collection
-          - Log collection
-
-          ## Accessing Components
-
-          ### Grafana Dashboard
-          ```bash
-          kubectl port-forward -n monitoring svc/nodepulse-grafana 3000:80
-          ```
-          Access: http://localhost:3000
-
-          ### Prometheus UI
-          ```bash
-          kubectl port-forward -n monitoring svc/nodepulse-prometheus-server 9090:9090
-          ```
-          Access: http://localhost:9090
-
-          ### Loki
-          ```bash
-          kubectl port-forward -n monitoring svc/nodepulse-loki 3100:3100
-          ```
-          Access: http://localhost:3100
-
-          ## Security
-
-          ### Authentication
-          - Grafana: Basic auth with custom password
-          - Prometheus: No auth by default (use network policies)
-          - Loki: No auth by default (use network policies)
-
-          ### Network Policies
-          ```yaml
-          apiVersion: networking.k8s.io/v1
-          kind: NetworkPolicy
-          metadata:
-            name: nodepulse-network-policy
-            namespace: monitoring
-          spec:
-            podSelector:
-              matchLabels:
-                app.kubernetes.io/name: nodepulse
-            ingress:
-              - from:
-                  - namespaceSelector:
-                      matchLabels:
-                        name: monitoring
-          ```
-
-          ## Monitoring and Alerts
-
-          ### Pre-configured Alerts
-          - Node memory pressure
-          - Pod restarts
-          - High CPU usage
-          - Disk space
-          - Security vulnerabilities
-
-          ### Custom Alert Rules
-          ```yaml
-          apiVersion: monitoring.coreos.com/v1
-          kind: PrometheusRule
-          metadata:
-            name: custom-alerts
-            namespace: monitoring
-          spec:
-            groups:
-              - name: custom
-                rules:
-                  - alert: HighErrorRate
-                    expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.1
-                    for: 5m
-                    labels:
-                      severity: critical
-                    annotations:
-                      summary: High error rate detected
-          ```
-
-          ## Upgrading
-
-          ```bash
-          # Update repositories
-          helm repo update
-
-          # Upgrade release
-          helm upgrade nodepulse nodepulse/nodepulse -n monitoring
-          ```
-
-          ## Uninstalling
-
-          ```bash
-          # Uninstall the chart
-          helm uninstall nodepulse -n monitoring
-
-          # Delete namespace (optional)
-          kubectl delete namespace monitoring
-          ```
-
-          ## Troubleshooting
-
-          ### Common Issues
-
-          1. **Storage Issues**
-          ```bash
-          # Check PVC status
-          kubectl get pvc -n monitoring
-
-          # Check storage class
-          kubectl get storageclass
-          ```
-
-          2. **Resource Constraints**
-          ```bash
-          # Check pod status
-          kubectl get pods -n monitoring
-
-          # Check resource usage
-          kubectl top pods -n monitoring
-          ```
-
-          3. **Network Issues**
-          ```bash
-          # Check service status
-          kubectl get svc -n monitoring
-
-          # Check network policies
-          kubectl get networkpolicy -n monitoring
-          ```
-
-          ## Contributing
-
-          We welcome contributions! Please see our [Contributing Guide](https://github.com/DARK-art108/nodepulse/blob/main/CONTRIBUTING.md) for details.
-
-          ## License
-
-          This project is licensed under the MIT License - see the [LICENSE](https://github.com/DARK-art108/nodepulse/blob/main/LICENSE) file for details. 
+            image: aquasec/trivy-operator:0.25.0
+      dependencies:
+        - name: prometheus
+          version: 25.0.0
+          repository: https://prometheus-community.github.io/helm-charts
+          condition: prometheus.enabled
+        - name: grafana
+          version: 7.1.0
+          repository: https://grafana.github.io/helm-charts
+          condition: grafana.enabled
+        - name: trivy-operator
+          version: 0.25.0
+          repository: https://aquasecurity.github.io/helm-charts
+          condition: trivy.enabled 

@@ -1,280 +1,354 @@
-# NodePulse - Local Setup Guide
+# NodePulse Setup Guide
 
-This guide will walk you through setting up NodePulse in a local Kubernetes environment and accessing all its dashboards.
+This guide provides detailed instructions for setting up NodePulse in both Docker Desktop and production environments.
 
-## Prerequisites
+## Table of Contents
 
-1. **Local Kubernetes Cluster**
-   - [Minikube](https://minikube.sigs.k8s.io/docs/start/) or
-   - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/) or
-   - [Docker Desktop with Kubernetes](https://docs.docker.com/desktop/kubernetes/)
+1. [Environment Setup](#environment-setup)
+2. [Installation](#installation)
+3. [Configuration](#configuration)
+4. [Monitoring Setup](#monitoring-setup)
+5. [Security Configuration](#security-configuration)
+6. [Troubleshooting](#troubleshooting)
 
-2. **Required Tools**
+## Environment Setup
+
+### Docker Desktop
+
+1. **System Requirements**
    ```bash
-   # Install kubectl
-   brew install kubectl  # macOS
-   # or
-   sudo apt-get install kubectl  # Ubuntu
-
-   # Install Helm
-   brew install helm  # macOS
-   # or
-   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash  # Linux
+   # Check Docker version
+   docker --version
+   # Check Kubernetes status
+   kubectl version
    ```
 
-## Local Cluster Setup
+2. **Resource Allocation**
+   - Minimum: 4GB RAM, 2 CPU cores
+   - Recommended: 8GB RAM, 4 CPU cores
+   - Storage: 20GB free space
 
-### Option 1: Using Minikube
+3. **Enable Kubernetes**
+   ```bash
+   # Open Docker Desktop
+   # Go to Settings > Kubernetes
+   # Check "Enable Kubernetes"
+   # Click "Apply & Restart"
+   ```
 
-```bash
-# Start Minikube with sufficient resources
-minikube start --memory=8192 --cpus=4 --disk-size=50g
+### Production Cluster
 
-# Enable required addons
-minikube addons enable metrics-server
-minikube addons enable default-storageclass
-minikube addons enable storage-provisioner
+1. **Prerequisites**
+   ```bash
+   # Check Kubernetes version
+   kubectl version
+   # Check Helm version
+   helm version
+   ```
 
-# Verify cluster status
-kubectl get nodes
-```
+2. **Resource Requirements**
+   - Minimum: 8GB RAM, 4 CPU cores per node
+   - Recommended: 16GB RAM, 8 CPU cores per node
+   - Storage: 100GB+ per node
 
-### Option 2: Using Kind
+3. **Storage Setup**
+   ```bash
+   # Check available storage classes
+   kubectl get storageclass
+   # Create storage class if needed
+   kubectl apply -f storage-class.yaml
+   ```
 
-```bash
-# Create Kind cluster configuration
-cat > kind-config.yaml << EOF
-kind: Cluster
-apiVersion: kind.x-k8s.io/v1alpha4
-nodes:
-- role: control-plane
-  extraPortMappings:
-  - containerPort: 30000
-    hostPort: 30000
-  - containerPort: 30001
-    hostPort: 30001
-  - containerPort: 30002
-    hostPort: 30002
-- role: worker
-- role: worker
-EOF
+## Installation
 
-# Create the cluster
-kind create cluster --config kind-config.yaml
+### Docker Desktop
 
-# Verify cluster status
-kubectl get nodes
-```
-
-## Installing NodePulse
-
-1. **Add Required Helm Repositories**
+1. **Add Helm Repositories**
    ```bash
    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
    helm repo add grafana https://grafana.github.io/helm-charts
-   helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server
    helm repo add aquasecurity https://aquasecurity.github.io/helm-charts
-   helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
    helm repo update
    ```
 
-2. **Create Monitoring Namespace**
+2. **Create Namespace**
    ```bash
    kubectl create namespace monitoring
    ```
 
 3. **Install NodePulse**
    ```bash
-   # Navigate to the chart directory
-   cd monitoring-stack
-
-   # Install with custom values for local setup
-   helm install nodepulse . -n monitoring \
-     --set prometheus.server.retention=7d \
-     --set grafana.adminPassword=admin \
-     --set loki.persistence.size=20Gi \
-     --set prometheus.server.resources.requests.memory=1Gi \
-     --set prometheus.server.resources.requests.cpu=500m
+   helm install nodepulse . -n monitoring
    ```
 
-4. **Verify Installation**
+### Production
+
+1. **Custom Values**
    ```bash
-   # Check all pods are running
-   kubectl get pods -n monitoring -w
-
-   # Check services
-   kubectl get svc -n monitoring
+   # Create custom values file
+   cat > values-production.yaml << EOF
+   global:
+     storageClass: standard
+   
+   prometheus:
+     server:
+       persistentVolume:
+         size: 50Gi
+       retention: 15d
+       resources:
+         limits:
+           memory: 4Gi
+           cpu: 2
+   
+   grafana:
+     persistence:
+       size: 20Gi
+     resources:
+       limits:
+         memory: 1Gi
+         cpu: 500m
+   
+   trivy:
+     resources:
+       limits:
+         memory: 2Gi
+         cpu: 1
+   EOF
    ```
 
-## Accessing Dashboards
+2. **Install with Custom Values**
+   ```bash
+   helm install nodepulse . -n monitoring -f values-production.yaml
+   ```
 
-### 1. Grafana Dashboard
+## Configuration
 
-```bash
-# Port-forward Grafana service
-kubectl port-forward -n monitoring svc/nodepulse-grafana 3000:80
-```
+### Prometheus
 
-Access Grafana:
-- URL: http://localhost:3000
-- Username: admin
-- Password: admin
+1. **Alert Rules**
+   ```yaml
+   # Example alert rule
+   groups:
+   - name: example
+     rules:
+     - alert: HighMemoryUsage
+       expr: container_memory_usage_bytes > 1e9
+       for: 5m
+       labels:
+         severity: warning
+       annotations:
+         summary: High memory usage
+   ```
 
-Pre-configured Dashboards:
-- Kubernetes / Compute Resources / Cluster
-- Kubernetes / Compute Resources / Namespace (Pods)
-- Kubernetes / Compute Resources / Pod
-- Kubernetes / Compute Resources / Workload
+2. **Service Discovery**
+   ```yaml
+   # Example service discovery
+   scrape_configs:
+     - job_name: 'kubernetes-pods'
+       kubernetes_sd_configs:
+         - role: pod
+   ```
 
-### 2. Prometheus UI
+### Grafana
 
-```bash
-# Port-forward Prometheus service
-kubectl port-forward -n monitoring svc/nodepulse-prometheus-server 9090:9090
-```
+1. **Dashboard Setup**
+   ```bash
+   # Import example dashboards
+   kubectl create configmap grafana-dashboards \
+     --from-file=dashboards/ \
+     -n monitoring
+   ```
 
-Access Prometheus:
-- URL: http://localhost:9090
-- No authentication required locally
+2. **Data Sources**
+   ```yaml
+   # Example datasource configuration
+   datasources:
+     - name: Prometheus
+       type: prometheus
+       url: http://prometheus-server.monitoring.svc.cluster.local
+       access: proxy
+   ```
 
-### 3. Loki (Logs)
+### Trivy
 
-```bash
-# Port-forward Loki service
-kubectl port-forward -n monitoring svc/nodepulse-loki 3100:3100
-```
+1. **Scan Configuration**
+   ```yaml
+   # Example scan configuration
+   vulnerabilityScanner:
+     enabled: true
+     schedule: "0 0 * * *"
+     concurrentScanJobsLimit: 5
+   ```
 
-Access Loki:
-- URL: http://localhost:3100
-- No authentication required locally
+2. **Report Retention**
+   ```yaml
+   # Example retention policy
+   reportRetention:
+     enabled: true
+     maxAge: 30d
+   ```
 
-### 4. Security Dashboard (Trivy)
+## Monitoring Setup
 
-```bash
-# Check vulnerability reports
-kubectl get vulnerabilityreports -A
+### Docker Desktop
 
-# Check config audit reports
-kubectl get configauditreports -A
-```
+1. **Port Forwarding**
+   ```bash
+   # Grafana
+   kubectl port-forward svc/grafana 3000:80 -n monitoring &
+   
+   # Prometheus
+   kubectl port-forward svc/prometheus-server 9090:80 -n monitoring &
+   
+   # AlertManager
+   kubectl port-forward svc/prometheus-alertmanager 9093:80 -n monitoring &
+   ```
 
-## Local Development Tips
+2. **Access URLs**
+   - Grafana: http://localhost:3000
+   - Prometheus: http://localhost:9090
+   - AlertManager: http://localhost:9093
 
-### 1. Resource Monitoring
+### Production
 
-```bash
-# Monitor cluster resources
-kubectl top nodes
-kubectl top pods -n monitoring
+1. **Ingress Setup**
+   ```yaml
+   # Example ingress configuration
+   apiVersion: networking.k8s.io/v1
+   kind: Ingress
+   metadata:
+     name: monitoring
+     namespace: monitoring
+   spec:
+     rules:
+     - host: monitoring.example.com
+       http:
+         paths:
+         - path: /grafana
+           pathType: Prefix
+           backend:
+             service:
+               name: grafana
+               port:
+                 number: 80
+   ```
 
-# Check resource usage
-kubectl describe nodes
-```
+2. **TLS Configuration**
+   ```yaml
+   # Example TLS configuration
+   tls:
+   - hosts:
+     - monitoring.example.com
+     secretName: monitoring-tls
+   ```
 
-### 2. Log Access
+## Security Configuration
 
-```bash
-# View component logs
-kubectl logs -n monitoring -l app.kubernetes.io/name=nodepulse
+### Authentication
 
-# Follow logs
-kubectl logs -n monitoring -f deployment/nodepulse-prometheus-server
-```
+1. **Grafana SSO**
+   ```yaml
+   # Example SSO configuration
+   grafana:
+     env:
+       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "your-client-id"
+       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "your-client-secret"
+   ```
 
-### 3. Storage Management
+2. **RBAC Setup**
+   ```yaml
+   # Example RBAC configuration
+   rbac:
+     create: true
+     pspEnabled: false
+   ```
 
-```bash
-# Check persistent volumes
-kubectl get pvc -n monitoring
+### Network Security
 
-# Check storage usage
-kubectl exec -n monitoring -it <prometheus-pod> -- df -h
-```
+1. **Network Policies**
+   ```yaml
+   # Example network policy
+   apiVersion: networking.k8s.io/v1
+   kind: NetworkPolicy
+   metadata:
+     name: monitoring
+     namespace: monitoring
+   spec:
+     podSelector: {}
+     ingress:
+     - from:
+       - namespaceSelector:
+           matchLabels:
+             name: monitoring
+   ```
 
-### 4. Network Access
+2. **TLS Configuration**
+   ```bash
+   # Generate TLS certificates
+   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+     -keyout tls.key -out tls.crt -subj "/CN=monitoring.example.com"
+   
+   # Create TLS secret
+   kubectl create secret tls monitoring-tls \
+     --key tls.key --cert tls.crt \
+     -n monitoring
+   ```
 
-```bash
-# Get service URLs
-minikube service list  # For Minikube
-# or
-kubectl get svc -n monitoring
+## Troubleshooting
 
-# Test service connectivity
-curl http://localhost:3000/api/health  # Grafana
-curl http://localhost:9090/-/healthy   # Prometheus
-```
+### Common Issues
 
-## Troubleshooting Local Setup
+1. **Prometheus OOM**
+   ```bash
+   # Check memory usage
+   kubectl top pods -n monitoring
+   
+   # Increase memory limits
+   helm upgrade nodepulse . -n monitoring \
+     --set prometheus.server.resources.limits.memory=4Gi
+   ```
 
-### 1. Pod Not Starting
+2. **Grafana Login Issues**
+   ```bash
+   # Reset admin password
+   kubectl exec -it $(kubectl get pods -n monitoring -l app.kubernetes.io/name=grafana -o jsonpath='{.items[0].metadata.name}') \
+     -n monitoring -- grafana-cli admin reset-admin-password newpassword
+   ```
 
-```bash
-# Check pod events
-kubectl describe pod -n monitoring <pod-name>
+3. **Trivy Scan Failures**
+   ```bash
+   # Check scan logs
+   kubectl logs -n monitoring -l app.kubernetes.io/name=trivy-operator
+   
+   # Adjust resource limits
+   helm upgrade nodepulse . -n monitoring \
+     --set trivy.resources.limits.memory=2Gi
+   ```
 
-# Check pod logs
-kubectl logs -n monitoring <pod-name>
-```
+### Log Collection
 
-### 2. Storage Issues
+1. **Component Logs**
+   ```bash
+   # Prometheus logs
+   kubectl logs -n monitoring -l app.kubernetes.io/name=prometheus
+   
+   # Grafana logs
+   kubectl logs -n monitoring -l app.kubernetes.io/name=grafana
+   
+   # Trivy logs
+   kubectl logs -n monitoring -l app.kubernetes.io/name=trivy-operator
+   ```
 
-```bash
-# Check PVC status
-kubectl get pvc -n monitoring
+2. **Event Logs**
+   ```bash
+   # Cluster events
+   kubectl get events -n monitoring --sort-by='.lastTimestamp'
+   ```
 
-# Check storage class
-kubectl get storageclass
+## Support
 
-# If using Minikube, check storage provisioner
-minikube addons list | grep storage
-```
-
-### 3. Network Issues
-
-```bash
-# Check service endpoints
-kubectl get endpoints -n monitoring
-
-# Test service connectivity
-kubectl run -it --rm --restart=Never --image=curlimages/curl curl -- \
-  curl http://nodepulse-prometheus-server.monitoring:9090/-/healthy
-```
-
-### 4. Resource Issues
-
-```bash
-# Check resource limits
-kubectl describe pod -n monitoring <pod-name>
-
-# Adjust resources if needed
-helm upgrade nodepulse . -n monitoring \
-  --set prometheus.server.resources.requests.memory=2Gi \
-  --set prometheus.server.resources.requests.cpu=1000m
-```
-
-## Cleanup
-
-```bash
-# Uninstall NodePulse
-helm uninstall nodepulse -n monitoring
-
-# Delete namespace
-kubectl delete namespace monitoring
-
-# If using Minikube
-minikube stop
-minikube delete
-
-# If using Kind
-kind delete cluster
-```
-
-## Next Steps
-
-1. Configure persistent storage for production
-2. Set up proper authentication
-3. Configure custom dashboards
-4. Set up alerting rules
-5. Configure backup and restore procedures
-
-For production setup, refer to the main [README.md](README.md) for security best practices and advanced configuration options. 
+For additional support:
+- GitHub Issues: https://github.com/DARK-art108/nodepulse/issues
+- Documentation: https://github.com/DARK-art108/nodepulse/docs
+- Community: https://github.com/DARK-art108/nodepulse/discussions 

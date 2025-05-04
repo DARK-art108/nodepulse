@@ -1,6 +1,6 @@
 apiVersion: v2
 name: nodepulse
-description: NodePulse is a plug-and-play observability stack for Kubernetes, combining Prometheus, Grafana, Loki, Trivy, OpenTelemetry, and more to deliver unified metrics, logs, traces, and security insights.
+description: A plug-and-play observability stack for Kubernetes
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
@@ -14,11 +14,12 @@ keywords:
   - monitoring
   - prometheus
   - grafana
-  - loki
-  - metrics
   - security
-  - tracing
   - kubernetes
+  - metrics
+  - alerting
+  - vulnerability
+  - scanning
 annotations:
   artifacthub.io/changes: |
     - Initial release
@@ -27,30 +28,18 @@ annotations:
       image: prom/prometheus:v2.45.0
     - name: grafana
       image: grafana/grafana:9.5.3
-    - name: loki
-      image: grafana/loki:2.8.2
-    - name: metrics-server
-      image: k8s.gcr.io/metrics-server/metrics-server:v0.6.3
     - name: trivy-operator
-      image: aquasec/trivy-operator:0.12.0
-    - name: opentelemetry-collector
-      image: otel/opentelemetry-collector:0.50.0
+      image: aquasec/trivy-operator:0.25.0
 dependencies:
   - name: prometheus
-    version: "19.7.2"
-    repository: "https://prometheus-community.github.io/helm-charts"
+    version: 25.0.0
+    repository: https://prometheus-community.github.io/helm-charts
+    condition: prometheus.enabled
   - name: grafana
-    version: "6.57.3"
-    repository: "https://grafana.github.io/helm-charts"
-  - name: loki
-    version: "5.8.0"
-    repository: "https://grafana.github.io/helm-charts"
-  - name: metrics-server
-    version: "3.11.0"
-    repository: "https://kubernetes-sigs.github.io/metrics-server"
+    version: 7.1.0
+    repository: https://grafana.github.io/helm-charts
+    condition: grafana.enabled
   - name: trivy-operator
-    version: "0.12.0"
-    repository: "https://aquasecurity.github.io/helm-charts"
-  - name: opentelemetry-collector
-    version: "0.50.0"
-    repository: "https://open-telemetry.github.io/opentelemetry-helm-charts" 
+    version: 0.25.0
+    repository: https://aquasecurity.github.io/helm-charts
+    condition: trivy.enabled 
