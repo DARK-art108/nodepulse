@@ -21,10 +21,6 @@
 
 ### 🐳 Docker Desktop
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/docker-setup.png" alt="Docker Setup" width="600"/>
-</div>
-
 1. **System Requirements** 🖥️
    ```bash
    # Check Docker version
@@ -48,9 +44,6 @@
 
 ### 🏭 Production Cluster
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/production-setup.png" alt="Production Setup" width="600"/>
-</div>
 
 1. **Prerequisites** 📋
    ```bash

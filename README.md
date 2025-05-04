@@ -24,10 +24,6 @@
 
 </div>
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/DARK-art108/nodepulse/main/docs/architecture.png" alt="NodePulse Architecture" width="800"/>
-</div>
-
 ## ✨ Overview
 
 NodePulse is a powerful, all-in-one Kubernetes observability stack that brings together the best of Prometheus, Grafana, and Trivy to deliver comprehensive monitoring and security insights for your Kubernetes clusters.
