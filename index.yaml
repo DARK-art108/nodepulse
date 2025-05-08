@@ -1,52 +1,215 @@
 apiVersion: v1
 entries:
+  grafana:
+  - annotations:
+      artifacthub.io/license: AGPL-3.0-only
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/grafana/helm-charts
+        - name: Upstream Project
+          url: https://github.com/grafana/grafana
+    apiVersion: v2
+    appVersion: 10.2.3
+    created: "2025-05-09T00:45:19.020078+05:30"
+    description: The leading tool for querying and visualizing time series and metrics.
+    digest: c262e7caed6f8d79c263f29ff8cf4fcf8251eac247f7c02545bdb48e2aaf7005
+    home: https://grafana.com
+    icon: https://artifacthub.io/image/b4fed1a7-6c8f-4945-b99d-096efa3e4116
+    keywords:
+    - monitoring
+    - metric
+    kubeVersion: ^1.8.0-0
+    maintainers:
+    - email: zanhsieh@gmail.com
+      name: zanhsieh
+    - email: rluckie@cisco.com
+      name: rtluckie
+    - email: maor.friedman@redhat.com
+      name: maorfr
+    - email: miroslav.hadzhiev@gmail.com
+      name: Xtigyro
+    - email: mail@torstenwalter.de
+      name: torstenwalter
+    name: grafana
+    sources:
+    - https://github.com/grafana/grafana
+    - https://github.com/grafana/helm-charts
+    type: application
+    urls:
+    - https://dark-art108.github.io/nodepulse/charts/grafana-7.1.0.tgz
+    version: 7.1.0
   nodepulse:
-    - apiVersion: v2
-      appVersion: "1.0.0"
-      created: "2025-05-04T23:10:18.000Z"
-      description: A plug-and-play observability stack for Kubernetes
-      digest: sha256:c2aa04d86de8ee3a0e11837102f78d1b5000ec893899b0ced7a18089f6dd4b96
-      home: https://github.com/DARK-art108/nodepulse
-      keywords:
-        - monitoring
-        - prometheus
-        - grafana
-        - security
-        - kubernetes
-        - metrics
-        - alerting
-        - vulnerability
-        - scanning
-      maintainers:
-        - email: daydreamingguy941@gmail.com
-          name: Ritesh Yadav
-      name: nodepulse
-      sources:
-        - https://github.com/DARK-art108/nodepulse
-      type: application
-      urls:
-        - nodepulse-0.1.0.tgz
-      version: 0.1.0
-      annotations:
-        artifacthub.io/changes: |
-          - Initial release
-        artifacthub.io/images: |
-          - name: prometheus
-            image: prom/prometheus:v2.45.0
-          - name: grafana
-            image: grafana/grafana:9.5.3
-          - name: trivy-operator
-            image: aquasec/trivy-operator:0.25.0
-      dependencies:
+  - annotations:
+      artifacthub.io/changes: |
+        - Initial release
+      artifacthub.io/images: |
         - name: prometheus
-          version: 25.0.0
-          repository: https://prometheus-community.github.io/helm-charts
-          condition: prometheus.enabled
+          image: prom/prometheus:v2.45.0
         - name: grafana
-          version: 7.1.0
-          repository: https://grafana.github.io/helm-charts
-          condition: grafana.enabled
+          image: grafana/grafana:9.5.3
         - name: trivy-operator
-          version: 0.25.0
-          repository: https://aquasecurity.github.io/helm-charts
-          condition: trivy.enabled 
+          image: aquasec/trivy-operator:0.25.0
+    apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-05-09T00:45:18.997354+05:30"
+    dependencies:
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 25.0.0
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 7.1.0
+    - condition: trivy.enabled
+      name: trivy-operator
+      repository: https://aquasecurity.github.io/helm-charts
+      version: 0.25.0
+    description: A plug-and-play observability stack for Kubernetes
+    digest: 0e8d880ef3e85a6d8fa7f7348a46d2e4d47231098e1b4d54824b6f6b7d1de46c
+    home: https://github.com/DARK-art108/nodepulse
+    keywords:
+    - monitoring
+    - prometheus
+    - grafana
+    - security
+    - kubernetes
+    - metrics
+    - alerting
+    - vulnerability
+    - scanning
+    maintainers:
+    - email: daydreamingguy941@gmail.com
+      name: Ritesh Yadav
+    name: nodepulse
+    sources:
+    - https://github.com/DARK-art108/nodepulse
+    type: application
+    urls:
+    - https://dark-art108.github.io/nodepulse/nodepulse-0.1.0.tgz
+    version: 0.1.0
+  - annotations:
+      artifacthub.io/changes: |
+        - Initial release
+      artifacthub.io/images: |
+        - name: prometheus
+          image: prom/prometheus:v2.45.0
+        - name: grafana
+          image: grafana/grafana:9.5.3
+        - name: trivy-operator
+          image: aquasec/trivy-operator:0.25.0
+    apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-05-09T00:45:19.017949+05:30"
+    dependencies:
+    - condition: prometheus.enabled
+      name: prometheus
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 25.0.0
+    - condition: grafana.enabled
+      name: grafana
+      repository: https://grafana.github.io/helm-charts
+      version: 7.1.0
+    - condition: trivy.enabled
+      name: trivy-operator
+      repository: https://aquasecurity.github.io/helm-charts
+      version: 0.25.0
+    description: A plug-and-play observability stack for Kubernetes
+    digest: c2aa04d86de8ee3a0e11837102f78d1b5000ec893899b0ced7a18089f6dd4b96
+    home: https://github.com/DARK-art108/nodepulse
+    keywords:
+    - monitoring
+    - prometheus
+    - grafana
+    - security
+    - kubernetes
+    - metrics
+    - alerting
+    - vulnerability
+    - scanning
+    maintainers:
+    - email: daydreamingguy941@gmail.com
+      name: Ritesh Yadav
+    name: nodepulse
+    sources:
+    - https://github.com/DARK-art108/nodepulse
+    type: application
+    urls:
+    - https://dark-art108.github.io/nodepulse/artifacts/nodepulse-0.1.0.tgz
+    version: 0.1.0
+  prometheus:
+  - annotations:
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/prometheus-community/helm-charts
+        - name: Upstream Project
+          url: https://github.com/prometheus/prometheus
+    apiVersion: v2
+    appVersion: v2.47.0
+    created: "2025-05-09T00:45:19.024154+05:30"
+    dependencies:
+    - condition: alertmanager.enabled
+      name: alertmanager
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 1.6.*
+    - condition: kube-state-metrics.enabled
+      name: kube-state-metrics
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 5.13.*
+    - condition: prometheus-node-exporter.enabled
+      name: prometheus-node-exporter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 4.23.*
+    - condition: prometheus-pushgateway.enabled
+      name: prometheus-pushgateway
+      repository: https://prometheus-community.github.io/helm-charts
+      version: 2.4.*
+    description: Prometheus is a monitoring system and time series database.
+    digest: e184541ca6086fbfa6ec7d294febf6a6329e1835dab0b4c4de9f0803581a8c4c
+    home: https://prometheus.io/
+    icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
+    keywords:
+    - monitoring
+    - prometheus
+    kubeVersion: '>=1.19.0-0'
+    maintainers:
+    - email: gianrubio@gmail.com
+      name: gianrubio
+    - email: zanhsieh@gmail.com
+      name: zanhsieh
+    - email: miroslav.hadzhiev@gmail.com
+      name: Xtigyro
+    - email: naseem@transit.app
+      name: naseemkullah
+    - email: rootsandtrees@posteo.de
+      name: zeritti
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/alertmanager
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus/pushgateway
+    - https://github.com/prometheus/node_exporter
+    - https://github.com/kubernetes/kube-state-metrics
+    type: application
+    urls:
+    - https://dark-art108.github.io/nodepulse/charts/prometheus-25.0.0.tgz
+    version: 25.0.0
+  trivy-operator:
+  - apiVersion: v2
+    appVersion: 0.23.0
+    created: "2025-05-09T00:45:19.026085+05:30"
+    description: Keeps security report resources updated
+    digest: aa3e717f30aab084c50669e78657afd9b1437264ba6839486d2d41b426523da0
+    keywords:
+    - aquasecurity
+    - trivyoperator
+    - trivy
+    name: trivy-operator
+    sources:
+    - https://github.com/aquasecurity/trivy-operator
+    type: application
+    urls:
+    - https://dark-art108.github.io/nodepulse/charts/trivy-operator-0.25.0.tgz
+    version: 0.25.0
+generated: "2025-05-09T00:45:18.973682+05:30"
